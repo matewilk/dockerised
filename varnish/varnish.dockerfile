@@ -37,26 +37,8 @@ RUN apt install -y varnish
 # copy vanish config file
 COPY /varnish/default.vcl /etc/varnish
 
-# install OHI nri-varnish
-RUN apt install -y git
-RUN git clone https://github.com/newrelic/nri-varnish
-# config file seems to do nothing as it tries to pick up default varnisg.params location
-COPY /nri-varnish/varnish-config.yml /nri-varnish/varnish-config.yml
-# /etc/default/varnish should be a dir (accoring to NR docs) but it's a file
-# RUN cp /etc/default/varnish /etc/default/varnish.params
-# RUN cp /nri-varnish/src/testdata/varnish.params /etc/default/varnish.params
-COPY /nri-varnish/varnish.params /etc/default/varnish.params
-# removing varnish file to make it a dir as /bin executable requires
-RUN rm -rf /etc/default/varnish
-# crating a directory instead of the abouve file
-RUN mkdir /etc/default/varnish
-# placing varnish.params in that directory (as executable requires?)
-RUN cp /etc/default/varnish.params /etc/default/varnish/varnish.params
-
-RUN cd nri-varnish && make clean && make compile
-
 EXPOSE 8080
 
 # CMD sudo /etc/init.d/varnish start
 
-CMD /usr/sbin/varnishd -f /etc/varnish/default.vcl -s malloc,1G -T 127.0.0.1:2000 -a 0.0.0.0:8080 -F && /nri-varnish/bin/nri-varnish -instance_name TestVarnishInstance
+CMD /usr/sbin/varnishd -f /etc/varnish/default.vcl -s malloc,1G -T 127.0.0.1:2000 -a 0.0.0.0:8080 -F
