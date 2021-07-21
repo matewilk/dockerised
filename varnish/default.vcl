@@ -14,7 +14,9 @@ vcl 4.1;
 
 # Default backend definition. Set this to point to your content server.
 backend default {
-    .host = "0.0.0.0";
+    # since this is inside docker
+    # I use http as a container name to resolve IP address
+    .host = "http";
     .port = "8000";
 }
 
